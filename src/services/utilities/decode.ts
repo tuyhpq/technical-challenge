@@ -12,10 +12,7 @@ const DecodeErrorC = t.type({
 type DecodeError = t.TypeOf<typeof DecodeErrorC>;
 const DecodeError = (data: DecodeError): DecodeError => data;
 
-export const decodeModel = <Codec extends t.Mixed>(
-  data: unknown,
-  codec: Codec
-) => {
+export const decodeModel = <Codec extends t.Mixed>(data: unknown, codec: Codec) => {
   return pipe(
     codec.decode(data),
     fold(
@@ -23,11 +20,7 @@ export const decodeModel = <Codec extends t.Mixed>(
         console.warn('Data of decode error', data);
         throw DecodeError({
           name: 'DecodeException',
-          message:
-            '\n' +
-            errors
-              .map((error) => error.context.map(({ key }) => key).join('.'))
-              .join('\n'),
+          message: '\n' + errors.map((error) => error.context.map(({ key }) => key).join('.')).join('\n'),
           response: { data },
         });
       },
