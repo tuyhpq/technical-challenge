@@ -1,33 +1,58 @@
 <template>
-  <div class="container">
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-      Launch demo modal
-    </button>
+  <div class="container py-5">
+    <section class="text-center">
+      <h2 class="p-3 mb-2 bg-secondary text-white">COVID-19 CORONAVIRUS PANDEMIC</h2>
+      <p class="text-secondary">Last updated: {{ totalReport.lastUpdate }}</p>
+      <h2 class="mt-5">Coronavirus Cases:</h2>
+      <p class="h3 text-secondary">{{ withCommas(totalReport.cases) }}</p>
+      <h2 class="mt-5">Deaths:</h2>
+      <p class="h3 fw-bold">{{ withCommas(totalReport.deaths) }}</p>
+      <h2 class="mt-5">Recovered:</h2>
+      <p class="h3 text-success">{{ withCommas(totalReport.recovered) }}</p>
+    </section>
+    <section>
 
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            ...
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    </section>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { ReportService } from "@/services/ReportService";
+import { fold } from "fp-ts/Either";
+import { pipe } from "fp-ts/function";
 
-export default defineComponent({});
+export default defineComponent({
+  data() {
+    return {
+      totalReport: {
+        cases: 0,
+        deaths: 0,
+        recovered: 0,
+        lastUpdate: "",
+      },
+      totalReportLoading: false,
+    };
+  },
+  async created() {
+    const result = await ReportService.getTotalReport();
+    pipe(
+      result,
+      fold(
+        (error) => alert(error.message),
+        (result) => {
+          this.totalReport.cases = result.confirmed;
+          this.totalReport.deaths = result.deaths;
+          this.totalReport.recovered = result.active;
+          this.totalReport.lastUpdate = result.lastUpdate;
+        }
+      )
+    );
+  },
+  methods: {
+    withCommas(input: number | string) {
+      return input.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    },
+  },
+});
 </script>

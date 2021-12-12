@@ -8,6 +8,7 @@ export const TotalReportRaw = t.type({
     deaths_diff: t.number,
     active: t.number,
     active_diff: t.number,
+    last_update: t.string,
   }),
 });
 export type TotalReportRaw = t.TypeOf<typeof TotalReportRaw>;
@@ -19,6 +20,7 @@ export const TotalReportC = t.type({
   deathsDiff: t.number,
   active: t.number,
   activeDiff: t.number,
+  lastUpdate: t.string,
 });
 export type TotalReport = t.TypeOf<typeof TotalReportC>;
 export const TotalReport = ({ data }: TotalReportRaw): TotalReport => ({
@@ -28,4 +30,5 @@ export const TotalReport = ({ data }: TotalReportRaw): TotalReport => ({
   deathsDiff: data.deaths_diff,
   active: data.active,
   activeDiff: data.active_diff,
+  lastUpdate: data.last_update,
 });
