@@ -2,23 +2,33 @@
   <div class="container py-5">
     <section class="text-center">
       <h2 class="p-3 mb-2 bg-secondary text-white">COVID-19 CORONAVIRUS PANDEMIC</h2>
-      <p class="text-secondary">Last updated: {{ totalReport.lastUpdate }}</p>
+      <Spinner :isLoading="totalReportLoading">
+        <p class="text-secondary">Last updated: {{ totalReport.lastUpdate }}</p>
+      </Spinner>
       <h2 class="mt-5">Coronavirus Cases:</h2>
-      <p class="h3 text-secondary">{{ withCommas(totalReport.cases) }}</p>
+      <Spinner :isLoading="totalReportLoading">
+        <p class="h3 text-secondary">{{ withCommas(totalReport.cases) }}</p>
+      </Spinner>
       <h2 class="mt-5">Deaths:</h2>
-      <p class="h3 fw-bold">{{ withCommas(totalReport.deaths) }}</p>
+      <Spinner :isLoading="totalReportLoading">
+        <p class="h3 fw-bold">{{ withCommas(totalReport.deaths) }}</p>
+      </Spinner>
       <h2 class="mt-5">Recovered:</h2>
-      <p class="h3 text-success">{{ withCommas(totalReport.recovered) }}</p>
+      <Spinner :isLoading="totalReportLoading">
+        <p class="h3 text-success">{{ withCommas(totalReport.recovered) }}</p>
+      </Spinner>
     </section>
     <section class="text-center mt-5">
       <h2 class="p-3 mb-2 bg-secondary text-white">DAILY NEW CASES &amp; CLOSED CASES</h2>
-      <canvas ref="reportChart"></canvas>
+      <Spinner :isLoading="totalReportRangeLoading" />
+      <canvas ref="reportChart" v-show="!totalReportRangeLoading"></canvas>
     </section>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import Spinner from "@/components/Spinner.vue";
 import { ReportService } from "@/services/ReportService";
 import { fold } from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
@@ -31,6 +41,9 @@ const currentDate = new Date(2021, 11, 11);
 const reportRange = [0, 1, 2, 3, 4, 5, 6];
 
 export default defineComponent({
+  components: {
+    Spinner,
+  },
   data() {
     return {
       totalReport: {
@@ -40,10 +53,14 @@ export default defineComponent({
         lastUpdate: "",
       },
       totalReportLoading: false,
+      totalReportRangeLoading: false,
     };
   },
   async created() {
+    this.totalReportLoading = true;
     const result = await ReportService.getTotalReport();
+    this.totalReportLoading = false;
+
     pipe(
       result,
       fold(
@@ -58,12 +75,15 @@ export default defineComponent({
     );
   },
   async mounted() {
+    this.totalReportRangeLoading = true;
     const result = await ReportService.getTotalReportRange(
       reportRange.map(
         (i) =>
           new Date(new Date(currentDate).setMonth(currentDate.getMonth() - i))
       )
     );
+    this.totalReportRangeLoading = false;
+
     pipe(
       result,
       fold(
