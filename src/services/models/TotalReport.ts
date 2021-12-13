@@ -9,6 +9,7 @@ export const TotalReportRaw = t.type({
     active: t.number,
     active_diff: t.number,
     last_update: t.string,
+    date: t.string,
   }),
 });
 export type TotalReportRaw = t.TypeOf<typeof TotalReportRaw>;
@@ -21,6 +22,7 @@ export const TotalReportC = t.type({
   active: t.number,
   activeDiff: t.number,
   lastUpdate: t.string,
+  date: t.string,
 });
 export type TotalReport = t.TypeOf<typeof TotalReportC>;
 export const TotalReport = ({ data }: TotalReportRaw): TotalReport => ({
@@ -31,4 +33,5 @@ export const TotalReport = ({ data }: TotalReportRaw): TotalReport => ({
   active: data.active,
   activeDiff: data.active_diff,
   lastUpdate: data.last_update,
+  date: data.date,
 });

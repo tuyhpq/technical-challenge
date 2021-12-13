@@ -10,8 +10,9 @@
       <h2 class="mt-5">Recovered:</h2>
       <p class="h3 text-success">{{ withCommas(totalReport.recovered) }}</p>
     </section>
-    <section>
-
+    <section class="text-center mt-5">
+      <h2 class="p-3 mb-2 bg-secondary text-white">DAILY NEW CASES &amp; CLOSED CASES</h2>
+      <canvas ref="reportChart"></canvas>
     </section>
   </div>
 </template>
@@ -21,6 +22,13 @@ import { defineComponent } from "vue";
 import { ReportService } from "@/services/ReportService";
 import { fold } from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
+import Chart from "chart.js/auto";
+
+// APIs only support until 2021-12-11
+const currentDate = new Date(2021, 11, 11);
+
+// Default reports is list of last 7 days
+const reportRange = [0, 1, 2, 3, 4, 5, 6];
 
 export default defineComponent({
   data() {
@@ -45,6 +53,51 @@ export default defineComponent({
           this.totalReport.deaths = result.deaths;
           this.totalReport.recovered = result.active;
           this.totalReport.lastUpdate = result.lastUpdate;
+        }
+      )
+    );
+  },
+  async mounted() {
+    const result = await ReportService.getTotalReportRange(
+      reportRange.map(
+        (i) =>
+          new Date(new Date(currentDate).setMonth(currentDate.getMonth() - i))
+      )
+    );
+    pipe(
+      result,
+      fold(
+        (error) => alert(error.message),
+        (result) => {
+          new Chart(this.$refs["reportChart"] as HTMLCanvasElement, {
+            type: "scatter",
+            data: {
+              labels: result.map((report) => report.date),
+              datasets: [
+                {
+                  type: "bar",
+                  label: "Daily Closed Cases",
+                  data: result.map((report) => report.activeDiff),
+                  borderColor: "rgb(255, 99, 132)",
+                  backgroundColor: "rgba(255, 99, 132, 0.2)",
+                },
+                {
+                  type: "line",
+                  label: "Daily New Cases",
+                  data: result.map((report) => report.confirmedDiff),
+                  fill: false,
+                  borderColor: "rgb(54, 162, 235)",
+                },
+              ],
+            },
+            options: {
+              scales: {
+                y: {
+                  beginAtZero: true,
+                },
+              },
+            },
+          });
         }
       )
     );

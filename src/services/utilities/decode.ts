@@ -12,7 +12,7 @@ const DecodeErrorC = t.type({
 type DecodeError = t.TypeOf<typeof DecodeErrorC>;
 const DecodeError = (data: DecodeError): DecodeError => data;
 
-export const decodeModel = <Codec extends t.Mixed>(data: unknown, codec: Codec) => {
+export const decodeModel = <Codec extends t.Mixed>(data: unknown, codec: Codec): t.TypeOf<Codec> => {
   return pipe(
     codec.decode(data),
     fold(
