@@ -7,15 +7,15 @@
       </Spinner>
       <h2 class="mt-5">Coronavirus Cases:</h2>
       <Spinner :isLoading="totalReportLoading">
-        <p class="h3 text-secondary">{{ withCommas(totalReport.cases) }}</p>
+        <p class="h3 text-secondary">{{ totalReport.cases }}</p>
       </Spinner>
       <h2 class="mt-5">Deaths:</h2>
       <Spinner :isLoading="totalReportLoading">
-        <p class="h3 fw-bold">{{ withCommas(totalReport.deaths) }}</p>
+        <p class="h3 fw-bold">{{ totalReport.deaths }}</p>
       </Spinner>
       <h2 class="mt-5">Recovered:</h2>
       <Spinner :isLoading="totalReportLoading">
-        <p class="h3 text-success">{{ withCommas(totalReport.recovered) }}</p>
+        <p class="h3 text-success">{{ totalReport.recovered }}</p>
       </Spinner>
     </section>
     <section class="text-center mt-5">
@@ -24,7 +24,7 @@
       <canvas ref="reportChart" v-show="!totalReportRangeLoading"></canvas>
     </section>
     <section class="text-left mt-5">
-      <h2 class="p-3 mb-3 bg-secondary text-white">REPORTED CASES AND DEATHS BY COUNTRY</h2>
+      <h2 class="p-3 mb-3 bg-secondary text-white text-center">REPORTED CASES AND DEATHS BY COUNTRY</h2>
       <form class="row g-3" @submit.prevent="search">
         <div class="col-12">
           <label for="keywords" class="form-label">Keywords:</label>
@@ -47,7 +47,7 @@
           </select>
         </div>
         <div class="col-12">
-          <button type="submit" class="btn btn-primary">Search</button>
+          <button type="submit" class="btn btn-primary" :disabled="formSearchResultLoading || regionListLoading || provinceListLoading">Search</button>
         </div>
       </form>
       <div class="table-responsive mt-3">
@@ -68,7 +68,7 @@
           <tbody>
             <tr v-if="formSearchResultLoading">
               <td colspan="9" class="p-2">
-                <Spinner :isLoading="formSearchResultLoading" />
+                <Spinner />
               </td>
             </tr>
             <tr v-if="!formSearchResultLoading && formSearchResult.length === 0">
@@ -97,9 +97,8 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import Spinner from "@/components/Spinner.vue";
-import { ReportService } from "@/services/ReportService";
-import { RegionService } from "@/services/RegionService";
-import { ProvinceService } from "@/services/ProvinceService";
+import { ReportService, RegionService, ProvinceService } from "@/services";
+import { withCommas } from "@/services/utilities";
 import { fold } from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
 import Chart from "chart.js/auto";
@@ -121,9 +120,9 @@ export default defineComponent({
   },
   data(): {
     totalReport: {
-      cases: number;
-      deaths: number;
-      recovered: number;
+      cases: string;
+      deaths: string;
+      recovered: string;
       lastUpdate: string;
     };
     totalReportLoading: boolean;
@@ -153,9 +152,9 @@ export default defineComponent({
   } {
     return {
       totalReport: {
-        cases: 0,
-        deaths: 0,
-        recovered: 0,
+        cases: "",
+        deaths: "",
+        recovered: "",
         lastUpdate: "",
       },
       totalReportLoading: false,
@@ -193,9 +192,9 @@ export default defineComponent({
         fold(
           (error) => alert(error.message),
           (result) => {
-            this.totalReport.cases = result.confirmed;
-            this.totalReport.deaths = result.deaths;
-            this.totalReport.recovered = result.active;
+            this.totalReport.cases = withCommas(result.confirmed);
+            this.totalReport.deaths = withCommas(result.deaths);
+            this.totalReport.recovered = withCommas(result.active);
             this.totalReport.lastUpdate = result.lastUpdate;
           }
         )
@@ -302,7 +301,7 @@ export default defineComponent({
         fold(
           (error) => alert(error.message),
           (result) => {
-            this.formSearchResult = result.records
+            this.formSearchResult = result
               .map((record) => ({
                 country: `[${record.region.name}] ${record.region.province}`,
                 totalCases: record.confirmed.toString(),
@@ -317,9 +316,6 @@ export default defineComponent({
           }
         )
       );
-    },
-    withCommas(input: number | string) {
-      return input.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     },
   },
 });

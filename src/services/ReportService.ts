@@ -10,7 +10,7 @@ export namespace ReportService {
     try {
       const response = await axios.get('/reports/total', {
         params: {
-          date: date,
+          date: date ? moment(date).format('YYYY-MM-DD') : undefined,
         },
       });
       const data = decodeModel(response.data, TotalReportRaw);

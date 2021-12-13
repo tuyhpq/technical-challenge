@@ -1,4 +1,4 @@
-export * from './Result';
+export * from './core';
 export * from './TotalReport';
 export * from './Report';
 export * from './Region';

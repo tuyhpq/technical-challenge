@@ -14,7 +14,10 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   props: {
-    isLoading: Boolean,
+    isLoading: {
+      type: Boolean,
+      default: true,
+    },
   },
 });
 </script>

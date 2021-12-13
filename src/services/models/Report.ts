@@ -19,26 +19,24 @@ export const ReportRaw = t.type({
 });
 export type ReportRaw = t.TypeOf<typeof ReportRaw>;
 
-export const ReportC = t.type({
-  records: t.array(
-    t.type({
-      confirmed: t.number,
-      confirmedDiff: t.number,
-      deaths: t.number,
-      deathsDiff: t.number,
-      active: t.number,
-      activeDiff: t.number,
-      region: t.type({
-        name: t.string,
-        province: t.string,
-      }),
-      lastUpdate: t.string,
-    })
-  ),
-});
+export const ReportC = t.array(
+  t.type({
+    confirmed: t.number,
+    confirmedDiff: t.number,
+    deaths: t.number,
+    deathsDiff: t.number,
+    active: t.number,
+    activeDiff: t.number,
+    region: t.type({
+      name: t.string,
+      province: t.string,
+    }),
+    lastUpdate: t.string,
+  })
+);
 export type Report = t.TypeOf<typeof ReportC>;
-export const Report = ({ data }: ReportRaw): Report => ({
-  records: data.map((record) => ({
+export const Report = ({ data }: ReportRaw): Report =>
+  data.map((record) => ({
     confirmed: record.confirmed,
     confirmedDiff: record.confirmed_diff,
     deaths: record.deaths,
@@ -47,5 +45,4 @@ export const Report = ({ data }: ReportRaw): Report => ({
     activeDiff: record.active_diff,
     region: record.region,
     lastUpdate: record.last_update,
-  })),
-});
+  }));
