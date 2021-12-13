@@ -38,7 +38,7 @@ import Chart from "chart.js/auto";
 const currentDate = new Date(2021, 11, 11);
 
 // Default reports is list of last 7 days
-const reportRange = [0, 1, 2, 3, 4, 5, 6];
+const reportRange = [6, 5, 4, 3, 2, 1, 0];
 
 export default defineComponent({
   components: {
@@ -79,7 +79,7 @@ export default defineComponent({
     const result = await ReportService.getTotalReportRange(
       reportRange.map(
         (i) =>
-          new Date(new Date(currentDate).setMonth(currentDate.getMonth() - i))
+          new Date(new Date(currentDate).setDate(currentDate.getDate() - i))
       )
     );
     this.totalReportRangeLoading = false;
@@ -95,18 +95,18 @@ export default defineComponent({
               labels: result.map((report) => report.date),
               datasets: [
                 {
-                  type: "bar",
-                  label: "Daily Closed Cases",
-                  data: result.map((report) => report.activeDiff),
-                  borderColor: "rgb(255, 99, 132)",
-                  backgroundColor: "rgba(255, 99, 132, 0.2)",
-                },
-                {
                   type: "line",
                   label: "Daily New Cases",
                   data: result.map((report) => report.confirmedDiff),
                   fill: false,
                   borderColor: "rgb(54, 162, 235)",
+                },
+                {
+                  type: "bar",
+                  label: "Daily Closed Cases",
+                  data: result.map((report) => report.activeDiff),
+                  borderColor: "rgb(255, 99, 132)",
+                  backgroundColor: "rgba(255, 99, 132, 0.2)",
                 },
               ],
             },
