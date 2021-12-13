@@ -2,3 +2,10 @@
 $font-family-sans-serif: 'roboto condensed', sans-serif;
 
 @import '~bootstrap/scss/bootstrap';
+
+.table-nowrap {
+  th,
+  td {
+    white-space: nowrap;
+  }
+}

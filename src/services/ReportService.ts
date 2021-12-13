@@ -48,29 +48,21 @@ export namespace ReportService {
   };
 
   export const getReports = async ({
-    cityName,
     regionProvince,
     iso,
-    regionName,
     query,
-    date,
   }: {
-    cityName?: string;
     regionProvince?: string;
     iso?: string;
-    regionName?: string;
     query?: string;
     date?: Date;
   }): Result<Report> => {
     try {
       const response = await axios.get('/reports', {
         params: {
-          city_name: cityName,
-          region_province: regionProvince,
-          iso: iso,
-          region_name: regionName,
-          q: query,
-          date: date,
+          region_province: regionProvince || undefined,
+          iso: iso || undefined,
+          q: query || undefined,
         },
       });
       const data = decodeModel(response.data, ReportRaw);

@@ -9,6 +9,11 @@ export const ReportRaw = t.type({
       deaths_diff: t.number,
       active: t.number,
       active_diff: t.number,
+      region: t.type({
+        name: t.string,
+        province: t.string,
+      }),
+      last_update: t.string,
     })
   ),
 });
@@ -23,6 +28,11 @@ export const ReportC = t.type({
       deathsDiff: t.number,
       active: t.number,
       activeDiff: t.number,
+      region: t.type({
+        name: t.string,
+        province: t.string,
+      }),
+      lastUpdate: t.string,
     })
   ),
 });
@@ -35,5 +45,7 @@ export const Report = ({ data }: ReportRaw): Report => ({
     deathsDiff: record.deaths_diff,
     active: record.active,
     activeDiff: record.active_diff,
+    region: record.region,
+    lastUpdate: record.last_update,
   })),
 });
